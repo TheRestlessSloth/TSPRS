@@ -1,8 +1,8 @@
-#Привет всем!
+# Привет всем!
 
-##Сегодня я покажу как настроить Аtmel studio
+## Сегодня я покажу как настроить Аtmel studio
 
-###Перво-наперво установим Atmel Studio
+### Перво-наперво установим Atmel Studio
 
 Переходим по данной *https://www.microchip.com/mplab/avr-support/atmel-studio-7* 
 и нажмём *Atmel Studio 7.0 web installer (recommended)*
