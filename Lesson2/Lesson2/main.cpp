@@ -1,29 +1,19 @@
-/*
- * Lesson2.cpp
- *
- * Created: 04.04.2020 1:59:43
- * Author : timer
- */ 
-
+#define F_CPU 16000000UL  // 16 MHz
 #include <avr/io.h>
-#define F_CPU 16000000UL
 #include <util/delay.h>
 
-int main(void)
-{
-	DDRD = 0xFF;
-	TCCR0A = 0xFF;
-    /* Replace with your application code */
-    while (1) 
-    {
-		OCR0A = 33;
-		_delay_ms(1000);
-		OCR0A = 100;
-		_delay_ms(1000);
-		OCR0A = 255;
-		_delay_ms(1000);
-		OCR0A = 0;
-		_delay_ms(1000);
-    }
-}
+int main (void) {
+	// Port B pin 7 as output
+	DDRD = 0xFF
+
+	// Set on match, clear on BOTTOM
+	TCCR0A = (3 << COM0A0) | (3 << WGM00); //i.e. mode=WGM3
+	// Fast PWM, Fcpu speed
+	TCCR0B = ((1 << CS00) | (0 << WGM02)); //i.e. mode=WGM3
+
+	for (;;) {
+		OCR0A++;
+		_delay_ms(5);
+		}
+	}
 
