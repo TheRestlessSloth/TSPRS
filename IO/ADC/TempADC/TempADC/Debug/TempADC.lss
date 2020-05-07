@@ -1,0 +1,205 @@
+
+TempADC.elf:     file format elf32-avr
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         00000134  00000000  00000000  00000054  2**1
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         00000000  00800060  00800060  00000188  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  2 .comment      00000030  00000000  00000000  00000188  2**0
+                  CONTENTS, READONLY
+  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  000001b8  2**2
+                  CONTENTS, READONLY
+  4 .debug_aranges 00000020  00000000  00000000  000001f4  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  5 .debug_info   00000589  00000000  00000000  00000214  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  6 .debug_abbrev 000004f8  00000000  00000000  0000079d  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  7 .debug_line   00000192  00000000  00000000  00000c95  2**0
+                  CONTENTS, READONLY, DEBUGGING
+  8 .debug_frame  00000034  00000000  00000000  00000e28  2**2
+                  CONTENTS, READONLY, DEBUGGING
+  9 .debug_str    00000303  00000000  00000000  00000e5c  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 10 .debug_loc    00000048  00000000  00000000  0000115f  2**0
+                  CONTENTS, READONLY, DEBUGGING
+ 11 .debug_ranges 00000010  00000000  00000000  000011a7  2**0
+                  CONTENTS, READONLY, DEBUGGING
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+   0:	0c 94 2a 00 	jmp	0x54	; 0x54 <__ctors_end>
+   4:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+   8:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+   c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  10:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  14:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  18:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  1c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  20:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  24:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  28:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  2c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  30:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  34:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  38:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  3c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  40:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  44:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  48:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  4c:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+  50:	0c 94 34 00 	jmp	0x68	; 0x68 <__bad_interrupt>
+
+00000054 <__ctors_end>:
+  54:	11 24       	eor	r1, r1
+  56:	1f be       	out	0x3f, r1	; 63
+  58:	cf e5       	ldi	r28, 0x5F	; 95
+  5a:	d8 e0       	ldi	r29, 0x08	; 8
+  5c:	de bf       	out	0x3e, r29	; 62
+  5e:	cd bf       	out	0x3d, r28	; 61
+  60:	0e 94 36 00 	call	0x6c	; 0x6c <main>
+  64:	0c 94 98 00 	jmp	0x130	; 0x130 <_exit>
+
+00000068 <__bad_interrupt>:
+  68:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
+
+0000006c <main>:
+
+#define get_bit(reg,bitnum) ((reg & (1<<bitnum))>>bitnum)
+#include <avr/io.h>
+
+int main(void)
+{
+  6c:	cf 93       	push	r28
+  6e:	df 93       	push	r29
+  70:	00 d0       	rcall	.+0      	; 0x72 <main+0x6>
+  72:	1f 92       	push	r1
+  74:	cd b7       	in	r28, 0x3d	; 61
+  76:	de b7       	in	r29, 0x3e	; 62
+	int ADCOut=0;
+  78:	1a 82       	std	Y+2, r1	; 0x02
+  7a:	19 82       	std	Y+1, r1	; 0x01
+	char Temperature;
+
+	DDRD=0xFF; // set pin 4 on port D as output to control the buzzer
+  7c:	81 e3       	ldi	r24, 0x31	; 49
+  7e:	90 e0       	ldi	r25, 0x00	; 0
+  80:	2f ef       	ldi	r18, 0xFF	; 255
+  82:	fc 01       	movw	r30, r24
+  84:	20 83       	st	Z, r18
+	DDRA&=~(1<<0);
+  86:	8a e3       	ldi	r24, 0x3A	; 58
+  88:	90 e0       	ldi	r25, 0x00	; 0
+  8a:	2a e3       	ldi	r18, 0x3A	; 58
+  8c:	30 e0       	ldi	r19, 0x00	; 0
+  8e:	f9 01       	movw	r30, r18
+  90:	20 81       	ld	r18, Z
+  92:	2e 7f       	andi	r18, 0xFE	; 254
+  94:	fc 01       	movw	r30, r24
+  96:	20 83       	st	Z, r18
+
+	ADMUX=0b11000000;
+  98:	87 e2       	ldi	r24, 0x27	; 39
+  9a:	90 e0       	ldi	r25, 0x00	; 0
+  9c:	20 ec       	ldi	r18, 0xC0	; 192
+  9e:	fc 01       	movw	r30, r24
+  a0:	20 83       	st	Z, r18
+
+	ADCSRA=0b10000111;
+  a2:	86 e2       	ldi	r24, 0x26	; 38
+  a4:	90 e0       	ldi	r25, 0x00	; 0
+  a6:	27 e8       	ldi	r18, 0x87	; 135
+  a8:	fc 01       	movw	r30, r24
+  aa:	20 83       	st	Z, r18
+
+
+	while(1)
+	{
+		ADCSRA|=(1<<6); //Set bit 6 n ADCSRA to start conversion
+  ac:	86 e2       	ldi	r24, 0x26	; 38
+  ae:	90 e0       	ldi	r25, 0x00	; 0
+  b0:	26 e2       	ldi	r18, 0x26	; 38
+  b2:	30 e0       	ldi	r19, 0x00	; 0
+  b4:	f9 01       	movw	r30, r18
+  b6:	20 81       	ld	r18, Z
+  b8:	20 64       	ori	r18, 0x40	; 64
+  ba:	fc 01       	movw	r30, r24
+  bc:	20 83       	st	Z, r18
+		while(get_bit(ADCSRA,6)==1) // poll bit 6 n ADCSRA till it is back to zero again
+  be:	86 e2       	ldi	r24, 0x26	; 38
+  c0:	90 e0       	ldi	r25, 0x00	; 0
+  c2:	fc 01       	movw	r30, r24
+  c4:	80 81       	ld	r24, Z
+  c6:	88 2f       	mov	r24, r24
+  c8:	90 e0       	ldi	r25, 0x00	; 0
+  ca:	80 74       	andi	r24, 0x40	; 64
+  cc:	99 27       	eor	r25, r25
+  ce:	08 2e       	mov	r0, r24
+  d0:	89 2f       	mov	r24, r25
+  d2:	00 0c       	add	r0, r0
+  d4:	88 1f       	adc	r24, r24
+  d6:	99 0b       	sbc	r25, r25
+  d8:	00 0c       	add	r0, r0
+  da:	88 1f       	adc	r24, r24
+  dc:	99 1f       	adc	r25, r25
+  de:	21 e0       	ldi	r18, 0x01	; 1
+  e0:	01 97       	sbiw	r24, 0x01	; 1
+  e2:	09 f0       	breq	.+2      	; 0xe6 <main+0x7a>
+  e4:	20 e0       	ldi	r18, 0x00	; 0
+  e6:	22 23       	and	r18, r18
+  e8:	09 f0       	breq	.+2      	; 0xec <main+0x80>
+  ea:	e9 cf       	rjmp	.-46     	; 0xbe <main+0x52>
+		{
+		}
+		ADCOut=ADCL|(ADCH<<8); // Save the ADC reading into an integer variable ADCOut. The ADCL must be read first as written here.
+  ec:	84 e2       	ldi	r24, 0x24	; 36
+  ee:	90 e0       	ldi	r25, 0x00	; 0
+  f0:	fc 01       	movw	r30, r24
+  f2:	80 81       	ld	r24, Z
+  f4:	28 2f       	mov	r18, r24
+  f6:	30 e0       	ldi	r19, 0x00	; 0
+  f8:	85 e2       	ldi	r24, 0x25	; 37
+  fa:	90 e0       	ldi	r25, 0x00	; 0
+  fc:	fc 01       	movw	r30, r24
+  fe:	80 81       	ld	r24, Z
+ 100:	88 2f       	mov	r24, r24
+ 102:	90 e0       	ldi	r25, 0x00	; 0
+ 104:	98 2f       	mov	r25, r24
+ 106:	88 27       	eor	r24, r24
+ 108:	82 2b       	or	r24, r18
+ 10a:	93 2b       	or	r25, r19
+ 10c:	9a 83       	std	Y+2, r25	; 0x02
+ 10e:	89 83       	std	Y+1, r24	; 0x01
+		Temperature=ADCOut/4; // Calculate Temperature
+ 110:	89 81       	ldd	r24, Y+1	; 0x01
+ 112:	9a 81       	ldd	r25, Y+2	; 0x02
+ 114:	99 23       	and	r25, r25
+ 116:	0c f4       	brge	.+2      	; 0x11a <main+0xae>
+ 118:	03 96       	adiw	r24, 0x03	; 3
+ 11a:	95 95       	asr	r25
+ 11c:	87 95       	ror	r24
+ 11e:	95 95       	asr	r25
+ 120:	87 95       	ror	r24
+ 122:	8b 83       	std	Y+3, r24	; 0x03
+		PORTD = Temperature;
+ 124:	82 e3       	ldi	r24, 0x32	; 50
+ 126:	90 e0       	ldi	r25, 0x00	; 0
+ 128:	2b 81       	ldd	r18, Y+3	; 0x03
+ 12a:	fc 01       	movw	r30, r24
+ 12c:	20 83       	st	Z, r18
+	ADMUX=0b11000000;
+
+	ADCSRA=0b10000111;
+
+
+	while(1)
+ 12e:	be cf       	rjmp	.-132    	; 0xac <main+0x40>
+
+00000130 <_exit>:
+ 130:	f8 94       	cli
+
+00000132 <__stop_program>:
+ 132:	ff cf       	rjmp	.-2      	; 0x132 <__stop_program>
